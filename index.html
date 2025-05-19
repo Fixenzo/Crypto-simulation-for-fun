@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login / Register - Crypto Trading Simulator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #00ffe4;
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    #auth-container {
+      background: #0d323bdd;
+      padding: 2.5rem 3rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 255, 228, 0.8);
+      width: 360px;
+      text-align: center;
+    }
+    #auth-container h2 {
+      margin: 0 0 1.8rem 0;
+      font-weight: 700;
+      font-size: 2rem;
+      text-shadow: 0 0 10px #00ffe4;
+      user-select: none;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+    }
+    label {
+      text-align: left;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #00ffdd;
+      letter-spacing: 0.5px;
+    }
+    input[type="text"], input[type="password"] {
+      background: #003640;
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem 1.2rem;
+      margin-bottom: 1.4rem;
+      font-size: 1rem;
+      color: #c0f9f5;
+      box-shadow: inset 0 0 5px #002121, 0 0 12px #00ffe4cc;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+      color: #77f9f1aa;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      background-color: #00505c;
+      box-shadow: inset 0 0 8px #00ffe4, 0 0 18px #00ffe4ee;
+      color: #e0ffff;
+    }
+    button {
+      background: linear-gradient(90deg, #00fff9, #00b8a9);
+      border: none;
+      border-radius: 16px;
+      padding: 0.85rem 0;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #002c2a;
+      cursor: pointer;
+      box-shadow: 0 0 20px #00ffe4cc;
+      transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+      user-select: none;
+      margin-bottom: 1rem;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #00b8a9, #00fff9);
+      color: #002419;
+      box-shadow: 0 0 28px #00ffe4ff;
+    }
+    #toggle-auth {
+      color: #00ffdd;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      user-select: none;
+      margin-top: -0.4rem;
+    }
+    #toggle-auth:hover {
+      color: #00a88e;
+    }
+    #auth-message {
+      min-height: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.9px;
+      text-shadow: 0 0 8px #00ffe4cc;
+      user-select: none;
+      margin-top: 0;
+    }
+    #auth-message.success {
+      color: #00ffdd;
+    }
+    #auth-message.error {
+      color: #ff6666;
+    }
+  </style>
+</head>
+<body>
+  <section id="auth-container" aria-label="Authentication">
+    <h2 id="form-title">Login to Your Account</h2>
+
+    <form id="login-form" autocomplete="off" novalidate>
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" name="username" placeholder="Enter username" required autocomplete="username" />
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" name="password" placeholder="Enter password" required autocomplete="current-password" />
+      <button type="submit">Log In</button>
+    </form>
+
+    <form id="register-form" autocomplete="off" novalidate style="display:none;">
+      <label for="register-username">Username</label>
+      <input type="text" id="register-username" name="username" placeholder="Choose username" required autocomplete="username" />
+      <label for="register-password">Password</label>
+      <input type="password" id="register-password" name="password" placeholder="Choose password" required autocomplete="new-password" />
+      <button type="submit">Register</button>
+    </form>
+
+    <div id="auth-message" role="alert" aria-live="polite"></div>
+
+    <div id="toggle-auth" tabindex="0" role="button" aria-pressed="false" aria-label="Switch to Register Form">Don't have an account? Register</div>
+  </section>
+
+  <script>
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const toggleAuth = document.getElementById('toggle-auth');
+    const authMessage = document.getElementById('auth-message');
+    const formTitle = document.getElementById('form-title');
+
+    let showingLogin = true;
+
+    function clearMessages() {
+      authMessage.textContent = '';
+      authMessage.className = '';
+    }
+
+    function toggleForms() {
+      clearMessages();
+      if(showingLogin) {
+        // switch to register
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'flex';
+        formTitle.textContent = 'Create a New Account';
+        toggleAuth.textContent = 'Already have an account? Log In';
+        toggleAuth.setAttribute('aria-label', 'Switch to Login Form');
+        toggleAuth.setAttribute('aria-pressed', 'true');
+      } else {
+        // switch to login
+        registerForm.style.display = 'none';
+        loginForm.style.display = 'flex';
+        formTitle.textContent = 'Login to Your Account';
+        toggleAuth.textContent = "Don't have an account? Register";
+        toggleAuth.setAttribute('aria-label', 'Switch to Register Form');
+        toggleAuth.setAttribute('aria-pressed', 'false');
+      }
+      showingLogin = !showingLogin;
+    }
+
+    toggleAuth.addEventListener('click', toggleForms);
+    toggleAuth.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleForms();
+      }
+    });
+
+    loginForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMessages();
+
+      const username = loginForm.username.value.trim();
+      const password = loginForm.password.value;
+
+      if(!username || !password) {
+        authMessage.className = 'error';
+        authMessage.textContent = 'Please enter username and password';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ username, password }),
+        });
+
+        if(response.ok) {
+          const data = await response.json();
+          localStorage.setItem('token', data.token);
+          authMessage.className = 'success';
+          authMessage.textContent = 'Login successful! Redirecting...';
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+        } else {
+          const data = await response.json();
+          authMessage.className = 'error';
+          authMessage.textContent = data.message || 'Login failed';
+        }
+      } catch (error) {
+        authMessage.className = 'error';
+        authMessage.textContent = 'Server error. Please try again later.';
+        console.error(error);
+      }
+    });
+
+    registerForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      clearMessages();
+
+      const username = registerForm.username.value.trim();
+      const password = registerForm.password.value;
+
+      if(!username || !password) {
+        authMessage.className = 'error';
+        authMessage.textContent = 'Please enter username and password';
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ username, password }),
+        });
+
+        if(response.ok) {
+          authMessage.className = 'success';
+          authMessage.textContent = 'Registration successful! You can now log in.';
+          registerForm.reset();
+          // Switch to login form after registration
+          toggleForms();
+        } else {
+          const data = await response.json();
+          authMessage.className = 'error';
+          authMessage.textContent = data.message || 'Registration failed';
+        }
+      } catch (error) {
+        authMessage.className = 'error';
+        authMessage.textContent = 'Server error. Please try again later.';
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
+
