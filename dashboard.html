@@ -166,6 +166,8 @@
   <header>
     Crypto Trading Simulator
   </header>
+<button id="logout-button">Logout</button>
+
   <main>
     <section id="prices-section" aria-label="Cryptocurrency Prices">
       <h2>Market Prices</h2>
@@ -490,6 +492,12 @@
 window.addEventListener('DOMContentLoaded', () => {
   alert('Selamat datang di Crypto Trading Simulator!\n\nWebsite ini adalah simulasi trading kripto yang memungkinkan kamu untuk membeli dan menjual mata uang kripto menggunakan saldo virtual. Data harga diambil secara real-time dari CoinGecko.\n\nPerlu di ingat bahwa setiap transaksi tersimpan di localstorage mu jadi tidak benar² tersimpan\n\ SALAM BOOYAHH😹');
 });
+// Tambahkan ini di dalam tag <script>
+document.getElementById('logout-button').addEventListener('click', () => {
+  localStorage.removeItem('user'); // Hapus data pengguna dari localStorage
+  window.location.href = 'index.html'; // Arahkan kembali ke halaman login
+});
+
   </script>
 </body>
 </html>
