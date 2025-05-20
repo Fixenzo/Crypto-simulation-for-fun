@@ -118,17 +118,17 @@
 
     <form id="login-form" autocomplete="off" novalidate>
       <label for="login-username">Username</label>
-      <input type="text" id="login-username" name="username" placeholder="Enter username" required autocomplete="username" />
+      <input type="text" id="login-username" name="username" placeholder="Enter username" required />
       <label for="login-password">Password</label>
-      <input type="password" id="login-password" name="password" placeholder="Enter password" required autocomplete="current-password" />
+      <input type="password" id="login-password" name="password" placeholder="Enter password" required />
       <button type="submit">Log In</button>
     </form>
 
     <form id="register-form" autocomplete="off" novalidate style="display:none;">
       <label for="register-username">Username</label>
-      <input type="text" id="register-username" name="username" placeholder="Choose username" required autocomplete="username" />
+      <input type="text" id="register-username" name="username" placeholder="Choose username" required />
       <label for="register-password">Password</label>
-      <input type="password" id="register-password" name="password" placeholder="Choose password" required autocomplete="new-password" />
+      <input type="password" id="register-password" name="password" placeholder="Choose password" required />
       <button type="submit">Register</button>
     </form>
 
@@ -153,21 +153,17 @@
 
     function toggleForms() {
       clearMessages();
-      if(showingLogin) {
-        // switch to register
+      if (showingLogin) {
         loginForm.style.display = 'none';
         registerForm.style.display = 'flex';
         formTitle.textContent = 'Create a New Account';
         toggleAuth.textContent = 'Already have an account? Log In';
-        toggleAuth.setAttribute('aria-label', 'Switch to Login Form');
         toggleAuth.setAttribute('aria-pressed', 'true');
       } else {
-        // switch to login
         registerForm.style.display = 'none';
         loginForm.style.display = 'flex';
         formTitle.textContent = 'Login to Your Account';
         toggleAuth.textContent = "Don't have an account? Register";
-        toggleAuth.setAttribute('aria-label', 'Switch to Register Form');
         toggleAuth.setAttribute('aria-pressed', 'false');
       }
       showingLogin = !showingLogin;
@@ -175,88 +171,59 @@
 
     toggleAuth.addEventListener('click', toggleForms);
     toggleAuth.addEventListener('keydown', e => {
-      if(e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         toggleForms();
       }
     });
 
-    loginForm.addEventListener('submit', async e => {
+    loginForm.addEventListener('submit', e => {
       e.preventDefault();
       clearMessages();
 
       const username = loginForm.username.value.trim();
       const password = loginForm.password.value;
+      const savedUser = JSON.parse(localStorage.getItem('user'));
 
-      if(!username || !password) {
+      if (!username || !password) {
         authMessage.className = 'error';
         authMessage.textContent = 'Please enter username and password';
         return;
       }
 
-      try {
-        const response = await fetch('https://crypto-simulation-for-fun-4ocm.vercel.app/login', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ username, password }),
-        });
-
-        if(response.ok) {
-          const data = await response.json();
-          localStorage.setItem('token', data.token);
-          authMessage.className = 'success';
-          authMessage.textContent = 'Login successful! Redirecting...';
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
-        } else {
-          const data = await response.json();
-          authMessage.className = 'error';
-          authMessage.textContent = data.message || 'Login failed';
-        }
-      } catch (error) {
+      if (savedUser && savedUser.username === username && savedUser.password === password) {
+        authMessage.className = 'success';
+        authMessage.textContent = 'Login successful! Redirecting...';
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1200);
+      } else {
         authMessage.className = 'error';
-        authMessage.textContent = 'Server error. Please try again later.';
-        console.error(error);
+        authMessage.textContent = 'Invalid username or password';
       }
     });
 
-    registerForm.addEventListener('submit', async e => {
+    registerForm.addEventListener('submit', e => {
       e.preventDefault();
       clearMessages();
 
       const username = registerForm.username.value.trim();
       const password = registerForm.password.value;
 
-      if(!username || !password) {
+      if (!username || !password) {
         authMessage.className = 'error';
         authMessage.textContent = 'Please enter username and password';
         return;
       }
 
-      try {
-        const response = await fetch('https://crypto-simulation-for-fun-4ocm.vercel.app/register', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ username, password }),
-        });
+      const userData = { username, password };
+      localStorage.setItem('user', JSON.stringify(userData));
 
-        if(response.ok) {
-          authMessage.className = 'success';
-          authMessage.textContent = 'Registration successful! You can now log in.';
-          registerForm.reset();
-          // Switch to login form after registration
-          toggleForms();
-        } else {
-          const data = await response.json();
-          authMessage.className = 'error';
-          authMessage.textContent = data.message || 'Registration failed';
-        }
-      } catch (error) {
-        authMessage.className = 'error';
-        authMessage.textContent = 'Server error. Please try again later.';
-        console.error(error);
-      }
+      authMessage.className = 'success';
+      authMessage.textContent = 'Registration successful! You can now log in.';
+      registerForm.reset();
+      toggleForms();
     });
   </script>
 </body>
 </html>
-
