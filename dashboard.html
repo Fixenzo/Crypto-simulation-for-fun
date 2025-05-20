@@ -233,7 +233,6 @@
     // Ambil data pengguna dari localStorage
     const savedUser   = JSON.parse(localStorage.getItem('user'));
 
-    // Cek apakah pengguna sudah login
     if (!savedUser  ) {
       alert('You must log in first!');
       window.location.href = 'index.html'; // Arahkan kembali ke halaman login
@@ -244,11 +243,9 @@
       document.body.insertBefore(header, document.querySelector('main'));
     }
 
-    // Ambil portofolio dan saldo dari localStorage
     const savedPortfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
-    const savedBalance = JSON.parse(localStorage.getItem('balance')) || 10000.00; // Default balance
+    const savedBalance = JSON.parse(localStorage.getItem('balance')) || 9999999.00; // Default balance
 
-    // Set portofolio dan saldo
     let portfolio = savedPortfolio;
     let balance = savedBalance;
 
