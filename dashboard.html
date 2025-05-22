@@ -161,28 +161,77 @@
       }
     }
  #daily-login-button {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background: #00ffe4;
-  color: #004d4d;
-  font-weight: 600;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  background: #ffcc00;
+  color: #222;
+  font-weight: bold;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  box-shadow: 0 0 10px #00ffe4aa;
-  z-index: 999;
-  transition: background-color 0.3s ease;
+  margin: 1rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 #daily-login-button:hover {
-  background: #00ccaa;
+  background: #ffaa00;
 }
-#daily-login-button:disabled {
-  background: #004d4d;
-  color: #ccc;
-  cursor: not-allowed;
-  box-shadow: none;
+
+#daily-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  text-align: center;
+  animation: popUp 0.5s ease-out;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.popup-content h2 {
+  color: #ffaa00;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.popup-content p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.popup-content button {
+  background: #ffaa00;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes popUp {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
   </style>
 </head>
@@ -192,7 +241,13 @@
   </header>
 <button id="logout-button">Logout</button>
 <button id="daily-login-button">Claim Daily Bonus</button>
-
+<div id="daily-popup" class="hidden">
+  <div class="popup-content">
+    <h2>Daily Login Bonus</h2>
+    <p>You’ve received <strong>$100</strong>!</p>
+    <button id="close-popup">OK</button>
+  </div>
+</div>
   <main>
     <section id="prices-section" aria-label="Cryptocurrency Prices">
       <h2>Market Prices</h2>
@@ -524,7 +579,9 @@ document.getElementById('logout-button').addEventListener('click', () => {
 
 
 const dailyLoginButton = document.getElementById('daily-login-button');
-const DAILY_BONUS_AMOUNT = 2000; // Besar bonus harian
+const dailyPopup = document.getElementById('daily-popup');
+const closePopup = document.getElementById('close-popup');
+const DAILY_BONUS_AMOUNT = 5000;
 
 function hasClaimedToday() {
   const lastClaim = localStorage.getItem('lastDailyLogin');
@@ -537,29 +594,28 @@ function hasClaimedToday() {
 }
 
 function updateDailyButtonState() {
-  if (hasClaimedToday()) {
-    dailyLoginButton.disabled = true;
-    dailyLoginButton.textContent = "Bonus Claimed Today";
-  } else {
-    dailyLoginButton.disabled = false;
-    dailyLoginButton.textContent = "Claim Daily Bonus";
-  }
+  dailyLoginButton.disabled = hasClaimedToday();
+  dailyLoginButton.textContent = hasClaimedToday()
+    ? "Bonus Already Claimed"
+    : "Claim Daily Bonus";
 }
 
 dailyLoginButton.addEventListener('click', () => {
-  if (hasClaimedToday()) {
-    showNotification("You've already claimed today's bonus!");
-    return;
-  }
+  if (hasClaimedToday()) return;
+
   balance += DAILY_BONUS_AMOUNT;
   localStorage.setItem('balance', JSON.stringify(balance));
   localStorage.setItem('lastDailyLogin', new Date().toISOString());
   balanceUsdEl.textContent = `${balance.toFixed(2)} USD`;
-  showNotification(`You've received $${DAILY_BONUS_AMOUNT.toFixed(2)} daily bonus!`);
+  dailyPopup.classList.remove('hidden');
   updateDailyButtonState();
 });
 
-updateDailyButtonState(); // Inisialisasi saat load
+closePopup.addEventListener('click', () => {
+  dailyPopup.classList.add('hidden');
+});
+
+updateDailyButtonState();
   </script>
 </body>
 </html>
