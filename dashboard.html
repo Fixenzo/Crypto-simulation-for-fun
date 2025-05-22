@@ -160,6 +160,30 @@
         max-height: none;
       }
     }
+ #daily-login-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: #00ffe4;
+  color: #004d4d;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00ffe4aa;
+  z-index: 999;
+  transition: background-color 0.3s ease;
+}
+#daily-login-button:hover {
+  background: #00ccaa;
+}
+#daily-login-button:disabled {
+  background: #004d4d;
+  color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
   </style>
 </head>
 <body>
@@ -497,6 +521,44 @@ document.getElementById('logout-button').addEventListener('click', () => {
   window.location.href = 'index.html'; // Arahkan kembali ke halaman login
 });
 
+
+const dailyLoginButton = document.getElementById('daily-login-button');
+const DAILY_BONUS_AMOUNT = 2000; // Besar bonus harian
+
+function hasClaimedToday() {
+  const lastClaim = localStorage.getItem('lastDailyLogin');
+  if (!lastClaim) return false;
+  const lastDate = new Date(lastClaim);
+  const today = new Date();
+  return lastDate.getFullYear() === today.getFullYear()
+    && lastDate.getMonth() === today.getMonth()
+    && lastDate.getDate() === today.getDate();
+}
+
+function updateDailyButtonState() {
+  if (hasClaimedToday()) {
+    dailyLoginButton.disabled = true;
+    dailyLoginButton.textContent = "Bonus Claimed Today";
+  } else {
+    dailyLoginButton.disabled = false;
+    dailyLoginButton.textContent = "Claim Daily Bonus";
+  }
+}
+
+dailyLoginButton.addEventListener('click', () => {
+  if (hasClaimedToday()) {
+    showNotification("You've already claimed today's bonus!");
+    return;
+  }
+  balance += DAILY_BONUS_AMOUNT;
+  localStorage.setItem('balance', JSON.stringify(balance));
+  localStorage.setItem('lastDailyLogin', new Date().toISOString());
+  balanceUsdEl.textContent = `${balance.toFixed(2)} USD`;
+  showNotification(`You've received $${DAILY_BONUS_AMOUNT.toFixed(2)} daily bonus!`);
+  updateDailyButtonState();
+});
+
+updateDailyButtonState(); // Inisialisasi saat load
   </script>
 </body>
 </html>
